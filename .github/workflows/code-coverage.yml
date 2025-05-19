@@ -20,8 +20,8 @@ jobs:
 
       - name: Install ReportGenerator tool
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
-
-      - name: Add .dotnet tools to PATH
+        # Adiciona o dotnet tools path ao PATH para poder usar reportgenerator diretamente
+      - name: Add dotnet tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Restore dependencies
@@ -44,24 +44,18 @@ jobs:
           coverageReportPath="coverlet/reports/Cobertura.xml"
 
           if [ ! -f "$coverageReportPath" ]; then
-            echo "❌ Arquivo de cobertura não encontrado em $coverageReportPath"
+            echo "Arquivo de cobertura não encontrado em $coverageReportPath"
             exit 1
           fi
 
-          coverageLineRate=$(xmllint --xpath 'string(//coverage/@line-rate)' "$coverageReportPath")
-          coveragePercentage=$(echo "$coverageLineRate * 100" | bc -l)
-          coverageInt=${coveragePercentage%.*}
+          coveragePercentage=$(xmllint --xpath "string(//coverage/@line-rate)" "$coverageReportPath")
+          coveragePercentagePerc=$(echo "$coveragePercentage * 100" | bc -l | xargs printf "%.2f")
 
-          if [ "$coverageInt" -lt "$minCoverage" ]; then
-            echo "❌ Cobertura de código ${coveragePercentage}% está abaixo de ${minCoverage}%"
+          coverageInt=$(printf "%.0f" "$coveragePercentagePerc")
+
+          if (( $(echo "$coveragePercentagePerc < $minCoverage" | bc -l) )); then
+            echo "❌ Cobertura de código $coveragePercentagePerc% está abaixo de $minCoverage%"
             exit 1
           else
-            echo "✅ Cobertura de código ${coveragePercentage}% está acima de ${minCoverage}%"
+            echo "✅ Cobertura de código $coveragePercentagePerc% está acima de $minCoverage%"
           fi
-
-      - name: Upload cobertura como artefato
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: cobertura-report
-          path: coverlet/reports/
