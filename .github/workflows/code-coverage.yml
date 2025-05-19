@@ -37,6 +37,9 @@ jobs:
             -targetdir:"coverlet/reports" \
             -reporttypes:Cobertura
 
+      - name: Install xmllint
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+      
       - name: Validate code coverage
         shell: bash
         run: |
