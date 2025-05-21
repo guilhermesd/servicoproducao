@@ -32,13 +32,14 @@ jobs:
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: us-east-1
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Create ECR repositories if not exist
+    - name: Login manual no Amazon ECR
       run: |
-        aws ecr describe-repositories --repository-names servicoproducao-repo || aws ecr create-repository --repository-name servicoproducao-repo
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 439667737553.dkr.ecr.us-east-1.amazonaws.com
+
+    - name: Create ECR repository if not exist
+      run: |
+        aws ecr describe-repositories --repository-names servicoproducao-repo --region us-east-1 || \
+        aws ecr create-repository --repository-name servicoproducao-repo --region us-east-1
 
     - name: Build Docker image
       run: |
