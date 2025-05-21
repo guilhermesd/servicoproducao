@@ -42,7 +42,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -f WebApplication1/Dockerfile -t servicoproducao:${{ env.IMAGE_TAG }} .
+        docker build -f Api/Dockerfile -t servicoproducao:${{ env.IMAGE_TAG }} .
 
     - name: Tag Docker image
       run: |
