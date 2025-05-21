@@ -18,7 +18,7 @@ namespace Infrastructure.ServicosExternos
 
         public async Task<bool> AlterarStatusPedido(Guid idPedido, AlterarStatusPedidoDTO alterarStatusPedidoDTO)
         {
-            var response = await _http.PostAsJsonAsync($"{_configuration["UrlPedido"]}/api/pedidos/{idPedido}/alterar/status-pedido", alterarStatusPedidoDTO);
+            var response = await _http.PutAsJsonAsync($"{_configuration["UrlPedido"]}/api/pedidos/{idPedido}/alterar/status-pedido", alterarStatusPedidoDTO);
             response.EnsureSuccessStatusCode();
             return true;
         }
